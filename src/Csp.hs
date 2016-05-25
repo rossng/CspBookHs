@@ -15,6 +15,9 @@ stop = Process (const Nothing)
 coin :: Event
 coin = Ev "coin"
 
+tick :: Event
+tick = Ev "tick"
+
 coinAccepter :: Process
 coinAccepter = Process (\x -> case x of
                                 (Ev "coin") -> Just stop
@@ -51,3 +54,8 @@ isTrace (e:es) p = case run p e of
                       Nothing -> False
                       Just p' -> isTrace es p'
 isTrace [] p   = True
+
+(/) :: Process -> Trace -> Maybe Process
+(/) p (e:es) = p' >>= (Csp./ es)
+               where p' = run p e
+(/) p []   = Just p
