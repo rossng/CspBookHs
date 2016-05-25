@@ -33,3 +33,6 @@ catenate = (⌒)
 
 restrict :: Trace -> S.Set Event -> Trace
 restrict = (↾)
+
+(↓) :: Trace -> Event -> Int
+(↓) s x = length $ s ↾ S.singleton x
