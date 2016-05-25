@@ -20,6 +20,11 @@ coinAccepter = Process (\x -> case x of
                                 (Ev "coin") -> Just stop
                                 _           -> Nothing)
 
+clock :: Process
+clock = Process (\x -> case x of
+                          (Ev "tick") -> Just clock
+                          _           -> Nothing)
+
 prefix :: Event -> Process -> Process
 prefix c p = Process (\x -> if x == c then Just p else Nothing)
 
@@ -40,3 +45,9 @@ restrict = (↾)
 
 (↓) :: Trace -> Event -> Int
 (↓) s x = length $ s ↾ S.singleton x
+
+isTrace :: Trace -> Process -> Bool
+isTrace (e:es) p = case run p e of
+                      Nothing -> False
+                      Just p' -> isTrace es p'
+isTrace [] p   = True
