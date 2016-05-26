@@ -25,11 +25,10 @@ clock = Process (\x -> case x of
 -- a greedy customer will always accept a toffee or chocolate without paying. Else,
 -- he will pay a coin, but will then only accept a chocolate.
 greedyCustomer :: Process
-greedyCustomer = Process (choice $ Map.fromList
-                                    [(Ev "toffee", greedyCustomer)
-                                     (Ev "choc", greedyCustomer)
-                                     (Ev "coin", greedyCustomer')])
-                                     where greedyCustomer' = Process (choice $ Map.fromList [(Ev "choc", greedyCustomer)])
+greedyCustomer = choice $ Map.fromList [(Ev "toffee", greedyCustomer)
+                                      , (Ev "choc", greedyCustomer)
+                                      , (Ev "coin", greedyCustomer')]
+                    where greedyCustomer' = choice $ Map.fromList [(Ev "choc", greedyCustomer)]
 
 vendingMachine :: Process
 vendingMachine = Process (\x -> case x of
