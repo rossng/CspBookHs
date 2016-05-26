@@ -9,6 +9,12 @@ stop = Process (const Nothing)
 coin :: Event
 coin = Ev "coin"
 
+choc :: Event
+choc = Ev "choc"
+
+toffee :: Event
+toffee = Ev "toffee"
+
 tick :: Event
 tick = Ev "tick"
 
@@ -31,11 +37,12 @@ greedyCustomer = choice $ Map.fromList [(Ev "toffee", greedyCustomer)
                     where greedyCustomer' = choice $ Map.fromList [(Ev "choc", greedyCustomer)]
 
 vendingMachine :: Process
-vendingMachine = Process (\x -> case x of
-                                  (Ev "coin") -> Just (choice $
+vendingMachine = choice $ Map.fromList [(Ev "coin", choice $
                                                           Map.fromList [(Ev "choc", vendingMachine)
-                                                                      , (Ev "toffee", vendingMachine)])
-                                  _           -> Nothing)
+                                                                      , (Ev "toffee", vendingMachine)])]
 
+-- acts like \X . (coin -> choc -> X), so we can do:
+-- run greedyCustomerAndVendingMachine coin >>= (`run` choc) >>= (`run` coin) >>= (`run` choc)
+-- forever (or, alternatively: Just greedyCustomerAndVendingMachine >>= ((`run` coin) >> (`run` choc) >> (`run` coin)))
 greedyCustomerAndVendingMachine :: Process
 greedyCustomerAndVendingMachine = greedyCustomer Csp.|| vendingMachine
