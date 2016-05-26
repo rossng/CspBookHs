@@ -1,6 +1,7 @@
-module Csp where
+module Csp.Csp where
 
 import Text.Show.Functions
+import Prelude hiding ((/), (||))
 import qualified Data.Set as S
 import qualified Data.Map.Strict as Map
 
@@ -8,25 +9,6 @@ data Event = Ev String deriving (Eq, Ord, Show)
 newtype Process = Process { run :: Event -> Maybe Process}
                   deriving (Show)
 type Trace = [Event]
-
-stop :: Process
-stop = Process (const Nothing)
-
-coin :: Event
-coin = Ev "coin"
-
-tick :: Event
-tick = Ev "tick"
-
-coinAccepter :: Process
-coinAccepter = Process (\x -> case x of
-                                (Ev "coin") -> Just stop
-                                _           -> Nothing)
-
-clock :: Process
-clock = Process (\x -> case x of
-                          (Ev "tick") -> Just clock
-                          _           -> Nothing)
 
 prefix :: Event -> Process -> Process
 prefix c p = Process (\x -> if x == c then Just p else Nothing)
@@ -56,6 +38,12 @@ isTrace (e:es) p = case run p e of
 isTrace [] p   = True
 
 (/) :: Process -> Trace -> Maybe Process
-(/) p (e:es) = p' >>= (Csp./ es)
+(/) p (e:es) = p' >>= (/ es)
                where p' = run p e
 (/) p []   = Just p
+
+(||) :: Process -> Process -> Process
+(||) p q = Process (\e -> do
+                            p' <- run p e
+                            q' <- run q e
+                            Just (p' || q'))
