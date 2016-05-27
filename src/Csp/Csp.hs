@@ -4,6 +4,8 @@ import Text.Show.Functions
 import Prelude hiding ((/), (||))
 import qualified Data.Set as S
 import qualified Data.Map.Strict as Map
+import qualified Data.Foldable as F
+import Data.Maybe
 
 data Event = Ev String deriving (Eq, Ord, Show)
 newtype Process = Process { run :: Event -> Maybe Process}
@@ -59,3 +61,6 @@ concurrent p a b q = Process (\e -> do
                               | S.member e a                  = aux p' q  e
                               | S.member e b                  = aux p  q' e
                               | otherwise                     = Nothing
+
+isRefusal :: S.Set Event -> Process -> Bool
+isRefusal es p = all isNothing (map (run p) (S.toList es))
