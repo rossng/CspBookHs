@@ -47,3 +47,7 @@ vendingMachine = choice $ Map.fromList [(Ev "coin", choice $
 -- forever (or, alternatively: Just greedyCustomerAndVendingMachine >>= ((`run` coin) >> (`run` choc) >> (`run` coin)))
 greedyCustomerAndVendingMachine :: Process
 greedyCustomerAndVendingMachine = greedyCustomer Csp.|| vendingMachine
+
+-- acts like a -> b -> STOP
+abStop :: Process
+abStop = choice $ Map.fromList [(Ev "a", choice $ Map.fromList [(Ev "b", stop)])]

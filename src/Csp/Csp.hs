@@ -64,3 +64,12 @@ concurrent p a b q = Process (\e -> do
 
 isRefusal :: S.Set Event -> Process -> Bool
 isRefusal es p = all isNothing (map (run p) (S.toList es))
+
+isFailure :: (Trace, S.Set Event) -> Process -> Bool
+isFailure (tr, x) p = isTrace tr p && ir
+                      where ir = case (do
+                                        p' <- p / tr
+                                        Just (isRefusal x p')) of
+                                  Just True  -> True
+                                  Just False -> False
+                                  Nothing    -> False
