@@ -42,8 +42,20 @@ isTrace [] p   = True
                where p' = run p e
 (/) p []   = Just p
 
+-- simple implementation of ||, assuming p and q have the same alphabets
 (||) :: Process -> Process -> Process
 (||) p q = Process (\e -> do
                             p' <- run p e
                             q' <- run q e
                             Just (p' || q'))
+
+concurrent :: Process -> S.Set Event -> S.Set Event -> Process -> Process
+concurrent p a b q = Process (\e -> do
+                                p' <- run p e
+                                q' <- run q e
+                                aux p' q' e)
+                      where aux p' q' e
+                              | S.member e a && S.member e b  = aux p' q' e
+                              | S.member e a                  = aux p' q  e
+                              | S.member e b                  = aux p  q' e
+                              | otherwise                     = Nothing

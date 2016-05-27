@@ -36,6 +36,7 @@ greedyCustomer = choice $ Map.fromList [(Ev "toffee", greedyCustomer)
                                       , (Ev "coin", greedyCustomer')]
                     where greedyCustomer' = choice $ Map.fromList [(Ev "choc", greedyCustomer)]
 
+-- \X . (coin -> (choc -> X | toffee -> X))
 vendingMachine :: Process
 vendingMachine = choice $ Map.fromList [(Ev "coin", choice $
                                                           Map.fromList [(Ev "choc", vendingMachine)
